@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GIRIGO - Every Wish Has a Price</title>
+    <meta name="description" content="A cinematic horror-fantasy experience where every wish has a deadly price.">
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Inter:wght@300;400;700&display=swap" rel="stylesheet">
+    <!-- Firebase SDK (Version 9 modules will be used in script/firebase) -->
+</head>
+<body>
+    <!-- Audio Elements -->
+    <audio id="bg-audio" loop src="assets/chime.mp3"></audio> <!-- Placeholder ambient audio -->
+    <audio id="tick-audio" src="assets/tick.mp3"></audio>
+    <audio id="chime-audio" src="assets/chime.mp3"></audio>
+
+    <!-- App Container -->
+    <div id="app">
+        
+        <!-- Screen 1: Cinematic Intro -->
+        <section id="intro-screen" class="screen active">
+            <div class="video-background">
+                <video id="intro-video" muted loop playsinline>
+                    <source src="assets/girigo.mp4" type="video/mp4">
+                </video>
+                <div class="overlay-gradient"></div>
+                <div class="particles"></div>
+            </div>
+            
+            <div class="content-wrapper centered-content">
+                <h1 class="glitch-text" data-text="GIRIGO">GIRIGO</h1>
+                <p class="subtitle fade-in-delay">Every wish has a price.</p>
+                <button id="enter-btn" class="cinematic-btn fade-in-delay-2">ENTER</button>
+            </div>
+        </section>
+
+        <!-- Screen 2: Login -->
+        <section id="login-screen" class="screen hidden">
+            <div class="ambient-bg"></div>
+            <div class="glass-card login-card fade-in">
+                <h2 class="section-title">Identify Yourself</h2>
+                <form id="login-form">
+                    <div class="input-group">
+                        <label for="name">Name</label>
+                        <input type="text" id="name" required placeholder="Who makes the wish?">
+                    </div>
+                    <div class="input-group">
+                        <label for="email">Gmail</label>
+                        <input type="email" id="email" required placeholder="your.name@gmail.com">
+                        <span id="email-error" class="error-msg"></span>
+                    </div>
+                    <div class="input-group">
+                        <label for="password">Password</label>
+                        <input type="password" id="password" required placeholder="••••••••">
+                        <span id="auth-error" class="error-msg"></span>
+                    </div>
+                    <button type="submit" class="cinematic-btn" id="login-btn">
+                        <span class="btn-text">Proceed</span>
+                        <span class="loader hidden"></span>
+                    </button>
+                </form>
+            </div>
+        </section>
+
+        <!-- Screen 3: Wish Page -->
+        <section id="wish-screen" class="screen hidden">
+            <div class="ambient-bg crimson-tint"></div>
+            <div class="content-wrapper centered-content fade-in">
+                <h2 class="section-title breathing-text">What is your wish?</h2>
+                <div class="wish-container">
+                    <textarea id="wish-input" placeholder="Type your deepest desire..." rows="4"></textarea>
+                    <div class="shadow-overlay"></div>
+                </div>
+                <button id="make-wish-btn" class="cinematic-btn danger-btn">Make The Wish</button>
+            </div>
+        </section>
+
+        <!-- Screen 4: Countdown -->
+        <section id="countdown-screen" class="screen hidden">
+            <div class="video-background dark-pulse">
+                <video id="bg-video-countdown" autoplay muted loop playsinline>
+                    <source src="assets/girigo.mp4" type="video/mp4">
+                </video>
+                <div class="overlay-gradient dense"></div>
+            </div>
+            
+            <div class="content-wrapper centered-content">
+                <h2 class="terror-title fade-in">YOUR TIME IS RUNNING</h2>
+                <div class="countdown-container heartbeat">
+                    <div class="time-block">
+                        <span id="hours">23</span>
+                        <span class="label">HRS</span>
+                    </div>
+                    <span class="separator">:</span>
+                    <div class="time-block">
+                        <span id="minutes">59</span>
+                        <span class="label">MIN</span>
+                    </div>
+                    <span class="separator">:</span>
+                    <div class="time-block">
+                        <span id="seconds">59</span>
+                        <span class="label">SEC</span>
+                    </div>
+                </div>
+                <div class="progress-bar-container">
+                    <div id="life-progress" class="progress-fill"></div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Global Controls -->
+        <div class="global-controls">
+            <button id="mute-btn" class="icon-btn" aria-label="Mute/Unmute">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" id="vol-icon">
+                    <path d="M11 5L6 9H2v6h4l5 4V5z"></path>
+                    <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+                </svg>
+            </button>
+        </div>
+    </div>
+
+    <!-- Firebase App (the core Firebase SDK) -->
+    <script type="module" src="firebase.js"></script>
+    <script type="module" src="script.js"></script>
+</body>
+</html>
