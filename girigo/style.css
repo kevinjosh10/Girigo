@@ -462,3 +462,24 @@ body {
     .countdown-container { transform: scale(0.6); }
     .glass-card { padding: 2rem; width: 90%; }
 }
+
+.particles {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: radial-gradient(#fff 1px, transparent 1px), radial-gradient(#fff 1px, transparent 1px);
+    background-size: 50px 50px;
+    background-position: 0 0, 25px 25px;
+    opacity: 0.1;
+    animation: moveParticles 20s linear infinite;
+    pointer-events: none;
+    z-index: 1;
+}
+
+@keyframes moveParticles {
+    0% { transform: translateY(0) scale(1); opacity: 0; }
+    50% { opacity: 0.2; }
+    100% { transform: translateY(-100px) scale(1.5); opacity: 0; }
+}
