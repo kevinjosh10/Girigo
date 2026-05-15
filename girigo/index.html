@@ -13,9 +13,9 @@
 </head>
 <body>
     <!-- Audio Elements -->
-    <audio id="bg-audio" loop src="assets/chime.mp3"></audio> <!-- Placeholder ambient audio -->
-    <audio id="tick-audio" src="assets/tick.mp3"></audio>
-    <audio id="chime-audio" src="assets/chime.mp3"></audio>
+    <audio id="bg-audio" loop src="assets/chime.wav"></audio> <!-- Placeholder ambient audio -->
+    <audio id="tick-audio" src="assets/tick.wav"></audio>
+    <audio id="chime-audio" src="assets/chime.wav"></audio>
 
     <!-- App Container -->
     <div id="app">
@@ -23,9 +23,7 @@
         <!-- Screen 1: Cinematic Intro -->
         <section id="intro-screen" class="screen active">
             <div class="video-background">
-                <video id="intro-video" muted loop playsinline>
-                    <source src="assets/girigo.mp4" type="video/mp4">
-                </video>
+                <img id="intro-video" src="assets/bg.jpg" alt="background">
                 <div class="overlay-gradient"></div>
                 <div class="particles"></div>
             </div>
@@ -81,9 +79,7 @@
         <!-- Screen 4: Countdown -->
         <section id="countdown-screen" class="screen hidden">
             <div class="video-background dark-pulse">
-                <video id="bg-video-countdown" autoplay muted loop playsinline>
-                    <source src="assets/girigo.mp4" type="video/mp4">
-                </video>
+                <img id="bg-video-countdown" src="assets/bg.jpg" alt="background">
                 <div class="overlay-gradient dense"></div>
             </div>
             
