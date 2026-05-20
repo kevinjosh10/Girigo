@@ -1,4 +1,4 @@
-import { db, doc, setDoc, getDoc, serverTimestamp } from './firebase.js';
+import { db, ref, set, get, child, serverTimestamp } from './firebase.js';
 
 // DOM Elements
 const screens = {
@@ -130,21 +130,22 @@ loginForm.addEventListener('submit', async (e) => {
         const userId = email.toLowerCase();
         
         if (isLoginMode) {
-            const userDoc = await getDoc(doc(db, "users", userId));
-            if (!userDoc.exists()) {
+            const snapshot = await get(child(ref(db), `users/${userId}`));
+            if (!snapshot.exists()) {
                 throw new Error("Soul not found. Forge a pact first.");
             }
-            const userData = userDoc.data();
+            const userData = snapshot.val();
             if (userData.password !== password) {
                 throw new Error("Incorrect password.");
             }
             currentUser = { uid: userId, email: email, name: userData.name };
             
             // Update last login
-            await setDoc(doc(db, "users", userId), { lastLogin: serverTimestamp() }, { merge: true });
+            userData.lastLogin = serverTimestamp();
+            await set(ref(db, `users/${userId}`), userData);
         } else {
-            const userDoc = await getDoc(doc(db, "users", userId));
-            if (userDoc.exists()) {
+            const snapshot = await get(child(ref(db), `users/${userId}`));
+            if (snapshot.exists()) {
                 throw new Error("This soul has already forged a pact. Log in instead.");
             }
             if (!name) {
@@ -153,7 +154,7 @@ loginForm.addEventListener('submit', async (e) => {
             currentUser = { uid: userId, email: email, name: name };
             
             // Save new user metadata
-            await setDoc(doc(db, "users", userId), {
+            await set(ref(db, `users/${userId}`), {
                 name: name,
                 email: email,
                 password: password,
@@ -191,13 +192,9 @@ makeWishBtn.addEventListener('click', async () => {
     }, 600);
     
     try {
-        const userRef = doc(db, "wishes", currentUser.uid);
-        
-        // We use client-side time for the initial start to prevent lag,
-        // but server time can be used for validation if needed.
         const startTime = Date.now();
         
-        await setDoc(userRef, {
+        await set(ref(db, `wishes/${currentUser.uid}`), {
             wish: wishText,
             startTime: startTime,
             serverStartTime: serverTimestamp()
@@ -219,9 +216,9 @@ makeWishBtn.addEventListener('click', async () => {
 
 async function checkUserWishData(uid) {
     try {
-        const wishDoc = await getDoc(doc(db, "wishes", uid));
-        if (wishDoc.exists()) {
-            const data = wishDoc.data();
+        const snapshot = await get(child(ref(db), `wishes/${uid}`));
+        if (snapshot.exists()) {
+            const data = snapshot.val();
             const startMs = data.startTime;
             
             // Go directly to countdown
