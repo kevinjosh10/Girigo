@@ -19,13 +19,14 @@
 
     <!-- App Container -->
     <div id="app">
+        <canvas id="particle-canvas" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 5; pointer-events: none;"></canvas>
+        <div class="global-vignette"></div>
         
         <!-- Screen 1: Cinematic Intro -->
         <section id="intro-screen" class="screen active">
             <div class="video-background">
                 <img id="intro-video" src="assets/bg.jpg" alt="background">
                 <div class="overlay-gradient"></div>
-                <div class="particles"></div>
             </div>
             
             <div class="content-wrapper centered-content">

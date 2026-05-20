@@ -145,6 +145,12 @@ makeWishBtn.addEventListener('click', async () => {
     makeWishBtn.disabled = true;
     makeWishBtn.innerText = "Sealing fate...";
     
+    // Violent shake effect
+    document.body.classList.add('violent-shake-active');
+    setTimeout(() => {
+        document.body.classList.remove('violent-shake-active');
+    }, 600);
+    
     try {
         const userRef = doc(db, "wishes", currentUser.uid);
         
@@ -256,3 +262,91 @@ onAuthStateChanged(auth, (user) => {
         currentUser = user;
     }
 });
+
+// === TEXT DECRYPTION EFFECT ===
+const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%&*";
+const titleEl = document.querySelector('.glitch-text');
+const originalText = titleEl.getAttribute('data-text');
+
+function decryptText(element, targetText) {
+    let iterations = 0;
+    const interval = setInterval(() => {
+        element.innerText = targetText.split("")
+            .map((letter, index) => {
+                if (index < iterations) return targetText[index];
+                return letters[Math.floor(Math.random() * letters.length)];
+            })
+            .join("");
+        
+        if (iterations >= targetText.length) {
+            clearInterval(interval);
+        }
+        iterations += 1 / 3;
+    }, 30);
+}
+
+window.addEventListener('load', () => {
+    decryptText(titleEl, originalText);
+});
+
+// === PARTICLE SYSTEM (EMBERS) ===
+const canvas = document.getElementById('particle-canvas');
+const ctx = canvas.getContext('2d');
+let particlesArray = [];
+
+function resizeCanvas() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+}
+window.addEventListener('resize', resizeCanvas);
+resizeCanvas();
+
+class Particle {
+    constructor() {
+        this.x = Math.random() * canvas.width;
+        this.y = canvas.height + Math.random() * 200;
+        this.size = Math.random() * 3 + 1;
+        this.speedY = Math.random() * -2 - 0.5;
+        this.speedX = Math.random() * 2 - 1;
+        this.opacity = Math.random() * 0.8 + 0.1;
+        this.color = Math.random() > 0.5 ? `rgba(255, 69, 0, ${this.opacity})` : `rgba(255, 0, 0, ${this.opacity})`;
+    }
+    update() {
+        this.y += this.speedY;
+        this.x += this.speedX;
+        if (this.size > 0.1) this.size -= 0.01;
+        if (this.y < 0 || this.size <= 0.1) {
+            this.y = canvas.height + 10;
+            this.x = Math.random() * canvas.width;
+            this.size = Math.random() * 3 + 1;
+            this.opacity = Math.random() * 0.8 + 0.1;
+            this.color = Math.random() > 0.5 ? `rgba(255, 69, 0, ${this.opacity})` : `rgba(255, 0, 0, ${this.opacity})`;
+        }
+    }
+    draw() {
+        ctx.fillStyle = this.color;
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.shadowBlur = 10;
+        ctx.shadowColor = 'red';
+    }
+}
+
+function initParticles() {
+    for (let i = 0; i < 150; i++) {
+        particlesArray.push(new Particle());
+    }
+}
+
+function animateParticles() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    for (let i = 0; i < particlesArray.length; i++) {
+        particlesArray[i].update();
+        particlesArray[i].draw();
+    }
+    requestAnimationFrame(animateParticles);
+}
+initParticles();
+animateParticles();
+
