@@ -127,7 +127,8 @@ loginForm.addEventListener('submit', async (e) => {
     loginBtn.disabled = true;
     
     try {
-        const userId = email.toLowerCase();
+        // Realtime DB paths cannot contain '.', '#', '$', '[', or ']'
+        const userId = email.toLowerCase().replace(/\./g, '_');
         
         if (isLoginMode) {
             const snapshot = await get(child(ref(db), `users/${userId}`));
