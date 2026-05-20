@@ -58,13 +58,13 @@ enterBtn.addEventListener('click', () => {
         bgAudio.play().catch(e => console.log('Audio play blocked', e));
     }
     
-    // Check local storage to see where to go
-    const savedUser = localStorage.getItem('girigo_user');
+    // Check session storage to see where to go
+    const savedUser = sessionStorage.getItem('girigo_user');
     if (savedUser) {
         currentUser = { uid: savedUser };
         checkUserWishData(savedUser).catch(e => {
             console.error(e);
-            localStorage.removeItem('girigo_user');
+            sessionStorage.removeItem('girigo_user');
             switchScreen(screens.intro, screens.login);
         });
     } else {
@@ -157,7 +157,7 @@ loginForm.addEventListener('submit', async (e) => {
             });
         }
         
-        localStorage.setItem('girigo_user', userId);
+        sessionStorage.setItem('girigo_user', userId);
         
         playChime();
         // Check if user already made a wish
