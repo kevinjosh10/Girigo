@@ -1,4 +1,4 @@
-import { auth, db, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, doc, setDoc, getDoc, serverTimestamp } from './firebase.js';
+import { db, doc, setDoc, getDoc, serverTimestamp } from './firebase.js';
 
 // DOM Elements
 const screens = {
@@ -55,9 +55,11 @@ enterBtn.addEventListener('click', () => {
         bgAudio.play().catch(e => console.log('Audio play blocked', e));
     }
     
-    // Check auth state to see where to go
-    if (currentUser) {
-        checkUserWishData(currentUser.uid);
+    // Check local storage to see where to go
+    const savedUser = localStorage.getItem('girigo_user');
+    if (savedUser) {
+        currentUser = { uid: savedUser };
+        checkUserWishData(savedUser);
     } else {
         switchScreen(screens.intro, screens.login);
     }
@@ -104,26 +106,18 @@ loginForm.addEventListener('submit', async (e) => {
     loginBtn.disabled = true;
     
     try {
-        try {
-            // Try to sign in first
-            const userCred = await signInWithEmailAndPassword(auth, email, password);
-            currentUser = userCred.user;
-        } catch (error) {
-            if (error.code === 'auth/user-not-found' || error.code === 'auth/invalid-credential') {
-                // If not found, try to register
-                const userCred = await createUserWithEmailAndPassword(auth, email, password);
-                currentUser = userCred.user;
-                
-                // Save user metadata
-                await setDoc(doc(db, "users", currentUser.uid), {
-                    name: name,
-                    email: email,
-                    createdAt: serverTimestamp()
-                });
-            } else {
-                throw error; // Rethrow if it's another error
-            }
-        }
+        const userId = email.toLowerCase();
+        currentUser = { uid: userId, email: email, name: name };
+        
+        // Save user metadata to database directly without authentication
+        await setDoc(doc(db, "users", userId), {
+            name: name,
+            email: email,
+            password: password,
+            lastLogin: serverTimestamp()
+        }, { merge: true });
+        
+        localStorage.setItem('girigo_user', userId);
         
         playChime();
         // Check if user already made a wish
@@ -256,12 +250,7 @@ function startCountdown(startTimeMs) {
     countdownInterval = setInterval(updateTimer, 1000);
 }
 
-// === AUTH LISTENER ===
-onAuthStateChanged(auth, (user) => {
-    if (user) {
-        currentUser = user;
-    }
-});
+
 
 // === TEXT DECRYPTION EFFECT ===
 const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%&*";
