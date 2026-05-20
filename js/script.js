@@ -13,6 +13,8 @@ const enterBtn = document.getElementById('enter-btn');
 const loginForm = document.getElementById('login-form');
 const makeWishBtn = document.getElementById('make-wish-btn');
 const muteBtn = document.getElementById('mute-btn');
+const toggleAuthMode = document.getElementById('toggle-auth-mode');
+const nameGroup = document.getElementById('name-group');
 
 // Audio
 const bgAudio = document.getElementById('bg-audio');
@@ -24,6 +26,7 @@ let isMuted = false;
 let countdownInterval;
 let currentUser = null;
 const COUNTDOWN_DURATION = 24 * 60 * 60 * 1000; // 24 hours in ms
+let isLoginMode = false;
 
 // === UI & TRANSITIONS ===
 function switchScreen(from, to) {
@@ -59,9 +62,27 @@ enterBtn.addEventListener('click', () => {
     const savedUser = localStorage.getItem('girigo_user');
     if (savedUser) {
         currentUser = { uid: savedUser };
-        checkUserWishData(savedUser);
+        checkUserWishData(savedUser).catch(e => {
+            console.error(e);
+            localStorage.removeItem('girigo_user');
+            switchScreen(screens.intro, screens.login);
+        });
     } else {
         switchScreen(screens.intro, screens.login);
+    }
+});
+
+// Toggle Auth Mode
+toggleAuthMode.addEventListener('click', () => {
+    isLoginMode = !isLoginMode;
+    if (isLoginMode) {
+        nameGroup.classList.add('hidden');
+        toggleAuthMode.innerText = "New soul? Forge a pact.";
+        document.querySelector('#login-btn .btn-text').innerText = "Log In";
+    } else {
+        nameGroup.classList.remove('hidden');
+        toggleAuthMode.innerText = "Already have a pact? Log in.";
+        document.querySelector('#login-btn .btn-text').innerText = "Proceed";
     }
 });
 
@@ -107,21 +128,45 @@ loginForm.addEventListener('submit', async (e) => {
     
     try {
         const userId = email.toLowerCase();
-        currentUser = { uid: userId, email: email, name: name };
         
-        // Save user metadata to database directly without authentication
-        await setDoc(doc(db, "users", userId), {
-            name: name,
-            email: email,
-            password: password,
-            lastLogin: serverTimestamp()
-        }, { merge: true });
+        if (isLoginMode) {
+            const userDoc = await getDoc(doc(db, "users", userId));
+            if (!userDoc.exists()) {
+                throw new Error("Soul not found. Forge a pact first.");
+            }
+            const userData = userDoc.data();
+            if (userData.password !== password) {
+                throw new Error("Incorrect password.");
+            }
+            currentUser = { uid: userId, email: email, name: userData.name };
+            
+            // Update last login
+            await setDoc(doc(db, "users", userId), { lastLogin: serverTimestamp() }, { merge: true });
+        } else {
+            const userDoc = await getDoc(doc(db, "users", userId));
+            if (userDoc.exists()) {
+                throw new Error("This soul has already forged a pact. Log in instead.");
+            }
+            if (!name) {
+                throw new Error("Name is required to forge a pact.");
+            }
+            currentUser = { uid: userId, email: email, name: name };
+            
+            // Save new user metadata
+            await setDoc(doc(db, "users", userId), {
+                name: name,
+                email: email,
+                password: password,
+                createdAt: serverTimestamp(),
+                lastLogin: serverTimestamp()
+            });
+        }
         
         localStorage.setItem('girigo_user', userId);
         
         playChime();
         // Check if user already made a wish
-        checkUserWishData(currentUser.uid);
+        await checkUserWishData(userId);
         
     } catch (error) {
         authError.innerText = error.message;
@@ -204,6 +249,7 @@ async function checkUserWishData(uid) {
         }
     } catch (error) {
         console.error("Error checking wish data", error);
+        throw error;
     }
 }
 

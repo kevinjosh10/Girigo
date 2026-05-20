@@ -42,9 +42,9 @@
             <div class="glass-card login-card fade-in">
                 <h2 class="section-title">Identify Yourself</h2>
                 <form id="login-form">
-                    <div class="input-group">
+                    <div class="input-group" id="name-group">
                         <label for="name">Name</label>
-                        <input type="text" id="name" required placeholder="Who makes the wish?">
+                        <input type="text" id="name" placeholder="Who makes the wish?">
                     </div>
                     <div class="input-group">
                         <label for="email">Gmail</label>
@@ -60,6 +60,9 @@
                         <span class="btn-text">Proceed</span>
                         <span class="loader hidden"></span>
                     </button>
+                    <p id="toggle-auth-mode" style="margin-top: 1.5rem; color: var(--text-secondary); font-size: 0.9rem; cursor: pointer; text-decoration: underline; letter-spacing: 0.05rem;">
+                        Already have a pact? Log in.
+                    </p>
                 </form>
             </div>
         </section>
