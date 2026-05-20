@@ -6,6 +6,7 @@ import { getFirestore, doc, setDoc, getDoc, serverTimestamp } from "https://www.
 const firebaseConfig = {
   apiKey: "AIzaSyBssQXl-UmZT9ag3l8wEtT9vVGyG8WHemQ",
   authDomain: "girigo-506a6.firebaseapp.com",
+  databaseURL: "https://girigo-506a6-default-rtdb.asia-southeast1.firebasedatabase.app",
   projectId: "girigo-506a6",
   storageBucket: "girigo-506a6.firebasestorage.app",
   messagingSenderId: "845919669259",
