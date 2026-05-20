@@ -1,0 +1,16 @@
+{
+  "users": {
+    "dummy-uid-12345": {
+      "name": "Test User",
+      "email": "test_girigo@gmail.com",
+      "createdAt": 1715000000000
+    }
+  },
+  "wishes": {
+    "dummy-uid-12345": {
+      "wish": "I wish to understand the dark secrets of the universe.",
+      "startTime": 1715000000000,
+      "serverStartTime": 1715000000000
+    }
+  }
+}
