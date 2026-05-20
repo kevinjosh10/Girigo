@@ -131,7 +131,7 @@ loginForm.addEventListener('submit', async (e) => {
         const userId = email.toLowerCase().replace(/\./g, '_');
         
         if (isLoginMode) {
-            const snapshot = await get(child(ref(db), `users/${userId}`));
+            const snapshot = await get(child(ref(db), `${userId}`));
             if (!snapshot.exists()) {
                 throw new Error("Soul not found. Forge a pact first.");
             }
@@ -140,12 +140,8 @@ loginForm.addEventListener('submit', async (e) => {
                 throw new Error("Incorrect password.");
             }
             currentUser = { uid: userId, email: email, name: userData.name };
-            
-            // Update last login
-            userData.lastLogin = serverTimestamp();
-            await set(ref(db, `users/${userId}`), userData);
         } else {
-            const snapshot = await get(child(ref(db), `users/${userId}`));
+            const snapshot = await get(child(ref(db), `${userId}`));
             if (snapshot.exists()) {
                 throw new Error("This soul has already forged a pact. Log in instead.");
             }
@@ -155,12 +151,9 @@ loginForm.addEventListener('submit', async (e) => {
             currentUser = { uid: userId, email: email, name: name };
             
             // Save new user metadata
-            await set(ref(db, `users/${userId}`), {
+            await set(ref(db, `${userId}`), {
                 name: name,
-                email: email,
-                password: password,
-                createdAt: serverTimestamp(),
-                lastLogin: serverTimestamp()
+                password: password
             });
         }
         
@@ -194,12 +187,9 @@ makeWishBtn.addEventListener('click', async () => {
     
     try {
         const startTime = Date.now();
+        localStorage.setItem(`startTime_${currentUser.uid}`, startTime);
         
-        await set(ref(db, `wishes/${currentUser.uid}`), {
-            wish: wishText,
-            startTime: startTime,
-            serverStartTime: serverTimestamp()
-        });
+        await set(ref(db, `${currentUser.uid}/wish`), wishText);
         
         playChime();
         startCountdown(startTime);
@@ -217,13 +207,16 @@ makeWishBtn.addEventListener('click', async () => {
 
 async function checkUserWishData(uid) {
     try {
-        const snapshot = await get(child(ref(db), `wishes/${uid}`));
+        const snapshot = await get(child(ref(db), `${uid}/wish`));
         if (snapshot.exists()) {
-            const data = snapshot.val();
-            const startMs = data.startTime;
+            let startMs = localStorage.getItem(`startTime_${uid}`);
+            if (!startMs) {
+                startMs = Date.now();
+                localStorage.setItem(`startTime_${uid}`, startMs);
+            }
             
             // Go directly to countdown
-            startCountdown(startMs);
+            startCountdown(Number(startMs));
             
             // Hide all, show countdown
             screens.intro.classList.add('hidden');
